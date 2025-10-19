@@ -69,3 +69,83 @@
 ## 시스템콜
 
 - 사용자프로그램이 운영체제 서비스를 받기 위해 커널 함수를 호출하는 것
+## 동기식 입출력과 비동기식 입출력
+
+- **동기식 입출력(synchribous)**
+    - I/O 요청 후 입출력 작업이 완료된 후에야 제어가 사용자 프로그램에 넘어감
+    - 구현 방법 1
+        - I/O가 끝날 때까지 CPU를 낭비시킴
+        - 매시점 하나의 I/O만 일어날 수 있음
+    - 구현 방법 2
+        - I/O가 완료될 때까지 해당 프로그램에게서 CPU를 빼앗음
+        - I/O 처리를 기다리는 줄에 그 프로그램을 줄 세움
+        - 다른 프로그램에게 CPU를 줌
+        
+        → I/O 작업을 기다리고 다시 해당 프로그램으로 넘어와서 처리가 되므로 동기식이다!
+        
+- **비동기식 입출력(asynchronous I/O)**
+    - I/O가 시작된 후 입출력 작업이 끝나기를 기다리지 않고 제어가 사용자 프로그램에 즉시 넘어감
+- 동기식과 비동기식 모두 I/O의 완료는 **인터럽트**로 알려줌
+
+## DMA(Direct Memory Access)
+
+- 빠른 입출력 장치를 메모리에 가까운 속도로 처리하기 위해 사용
+- CPU의 중재 없이 device controller가 device의 buffer storage의 내용을 메모리에 block 단위로 직접 전송
+- 바이트 단위가 아니라 block 단위로 인터럽트를 발생시킴
+
+## 서로 다른 입출력 명령어
+
+- I/O를 수행하는 special instruction에 의해
+    - CPU가 입출력만을 위한 별도의 명령어를 사용해 I/O장치와 데이터를 주고 받는 방식
+    - 메모리 접근용 명령과 I/O 접근용 명령이 구분되어 있음
+- Memory Mapped I/O에 의해
+    - I/O 장치를 메모리 주소 공간에 포함시키는 방식
+    - 장치의 레지스터들이 메모리의 특정 주소에 연결되어 있음
+
+## 저장장치 계층 구조
+
+register → cache memory → main memory → magnetic disk → optional disk → magnetic tape
+
+- 위의 계층일수록 빠르고 비싸다.(비싸서 용량이 작다)
+- main memory까지는 excutable
+
+## 프로그램의 실행
+
+- 디스크에 위치함 실행파일은 메모리에 올라가기 전 virtual memory로 구성된다.
+- virtual memory에서 각 각 프로세스의 address space는 stack / data  / code로 구성된다.
+- 필요한 부분은 address translation을 통해 physical memory에 올라가 실행된다.
+    - physical memory는 user 영역와 커널 영역으로 이루어짐
+    - 필요없는 부분은 swap area에 저장된다.
+
+## 커널 주소 공간의 내용
+
+code
+
+- 커널 코드
+    - 시스템콜, 인터럽트 처리 코드
+    - 자원 관리를 위한 코드
+    - 편리한 서비스 제공을 위한 코드
+
+data
+
+- PCB
+    - 각 프로세스 별로 존재
+- cpu, memory, disk를 위한 자료구조
+
+stack
+
+- 각 프로세스에 대한 커널 스택
+
+## 사용자 프로그램이 사용하는 함수
+
+- 사용자 정의 함수
+    - 자신의 프로그램에서 정의한 함수
+    - 프로세스의 address space 중 code에 위치
+- 라이브러리 함수
+    - 자신의 프로그램에서 정의하지 않고 갖다 쓴 함수
+    - 자신의 프로그램의 실행 파일에 포함되어 있음
+    - 프로세스의 address space 중 code에 위치
+- 커널 함수
+    - 운영체제 프로그램의 함수
+    - 커널 함수의 호출 = 시스템 콜
+    - 커널 address space 중 code에 위치
